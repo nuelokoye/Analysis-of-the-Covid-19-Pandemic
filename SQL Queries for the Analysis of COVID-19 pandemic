@@ -1,0 +1,151 @@
+SELECT * FROM schema1.`covid-data`;
+
+-- 1. Number of continets in data 
+SELECT DISTINCT(continent)
+FROM schema1.`covid-data`
+WHERE continent != 'Null';
+
+-- 2. List of countries with the current date of updated data.  
+SELECT location, MAX(date)
+FROM schema1.`covid-data`
+WHERE continent != 'Null'
+GROUP BY location;
+
+-- 3. i. Number of locations in data 
+SELECT COUNT(DISTINCT(Location))
+FROM schema1.`covid-data`
+WHERE continent != 'Null';
+
+-- 3. ii. List of locations in data 
+SELECT DISTINCT(Location)
+FROM schema1.`covid-data`
+WHERE continent != 'Null';
+
+
+-- 4. Death ratio (Total Death to total cases) for various locations
+SELECT continent,location,population, SUM(new_cases) Total_cases , SUM(new_deaths) Total_Deaths, ROUND(SUM(new_deaths)/SUM(new_cases)*100,2) Death_Ratio
+FROM schema1.`covid-data`
+WHERE continent != 'Null'
+GROUP BY continent,location, population
+ORDER BY Death_Ratio DESC;
+
+-- 5. Looking at stastics what is the possiblity of dying if you contact covid in a place like nigeria currently --
+SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 AS percent_of_death
+FROM schema1.`covid-data`
+WHERE location like '%Nigeria%' 
+ORDER BY date desc;
+
+-- 5.i. Looking at stastics what is the possiblity of dying if you contact covid in a place like nigeria Peak Covid-19 period--
+SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 AS percent_of_death
+FROM schema1.`covid-data`
+WHERE location like '%Nigeria%' 
+ORDER BY percent_of_death desc;
+
+-- 6. showing percent of the population who has covid over a period of time In Nigeria 
+
+SELECT location, date, total_cases, population, (total_cases/population)*100 as percent_of_population_Infected
+FROM schema1.`covid-data`
+WHERE location like '%Nigeria%'
+ORDER BY date desc;
+
+-- 6.i. showing percent of the population who has covid over a period of time In the United states
+
+SELECT location, date, total_cases, population, (total_cases/population)*100 as percent_of_population_Infected
+FROM schema1.`covid-data`
+WHERE location like '%United States%'
+ORDER BY percent_of_population_Infected desc;
+
+-- 6.ii. showing percent of the population who has covid over a period of time In Canada
+
+SELECT location, date, total_cases, population, (total_cases/population)*100 as percent_of_population_Infected
+FROM schema1.`covid-data`
+WHERE location like '%Canada%'
+ORDER BY date desc;
+
+-- 7. Which locations had the highest infection ratio 
+SELECT continent,location, population, SUM(new_cases), ROUND((SUM(new_cases)/population)*100,2) AS Infection_Ratio
+FROM schema1.`covid-data`
+WHERE continent != 'Null'
+GROUP BY continent,location, population 
+ORDER BY  Infection_Ratio DESC;
+
+-- 8. Which locations had the highest death percentage per population
+SELECT continent,location, population, SUM(new_deaths) Total_Death, ROUND((SUM(new_deaths)/population)*100,2) AS Death_percentage
+FROM schema1.`covid-data`
+WHERE continent != 'Null'
+GROUP BY continent,location, population 
+ORDER BY Death_percentage DESC; 
+
+-- 9. continents with highest death count per population-------
+SELECT continent,SUM(DISTINCT(population)) Total_Population, SUM(new_deaths) Total_Deaths, SUM(new_deaths)/SUM(DISTINCT(population)) AS Death_Percentage
+FROM schema1.`covid-data`
+WHERE continent != 'Null'
+GROUP BY continent 
+ORDER BY Death_Percentage DESC;
+
+-- 10. which location had the highest confirmed cases in africa
+SELECT continent, location, population, MAX(total_cases) AS Highest_Infection_Count
+FROM schema1.`covid-data`
+WHERE continent LIKE '%Africa%'
+GROUP BY  continent, location, population
+ORDER BY Highest_Infection_Count DESC;
+
+-- 11. which location had the highest confirmed cases in Asia
+SELECT continent, location, population, MAX(total_cases) AS Highest_Infection_Count
+FROM schema1.`covid-data`
+WHERE continent LIKE '%Asia%'
+GROUP BY continent, location, population
+ORDER BY Highest_Infection_Count DESC;
+
+-- 12. which location had the highest confirmed cases in europe
+SELECT continent, location, population, MAX(total_cases) AS Highest_Infection_Count
+FROM schema1.`covid-data`
+WHERE continent LIKE '%Europe%'
+GROUP BY  continent, location, population
+ORDER BY Highest_Infection_Count DESC;
+
+-- 13. which location had the highest confirmed cases in North America
+SELECT continent, location, population, MAX(total_cases) AS Highest_Infection_Count
+FROM schema1.`covid-data`
+WHERE continent LIKE '%North America%'
+GROUP BY continent, location, population
+ORDER BY Highest_Infection_Count DESC;
+
+-- 14. which location had the highest confirmed cases in South America
+SELECT continent, location, population, MAX(total_cases) AS Highest_Infection_Count
+FROM schema1.`covid-data`
+WHERE continent LIKE '%South America'
+GROUP BY continent, location, population
+ORDER BY Highest_Infection_Count DESC;
+
+-- 15. which location had the highest confirmed cases in Oceania
+SELECT continent, location, population, MAX(total_cases) AS Highest_Infection_Count
+FROM schema1.`covid-data`
+WHERE continent LIKE '%Oceania'
+GROUP BY continent, location, population
+ORDER BY Highest_Infection_Count DESC;
+
+-- 16. Day with the single highest Total number of cases Globally 
+SELECT date, MAX(new_cases) AS highest_case_per_day
+FROM schema1.`covid-world`
+GROUP BY date 
+ORDER BY  highest_case_per_day DESC;
+
+-- 17. Day with the single highest Total number of deaths Globally 
+SELECT date, MAX(new_deaths) AS highest_death_per_day
+FROM schema1.`covid-data`
+GROUP BY date 
+ORDER BY  highest_death_per_day DESC;
+
+-- 18. Percentage of the world who have contracted covid-19 --
+SELECT date, population, MAX(total_cases) AS Highest_Infection_Count,  MAX((total_cases/population))*100 AS Percent_Population_Infected
+FROM schema1.`covid-world`
+GROUP BY date, population 
+ORDER BY Highest_Infection_Count DESC;
+
+-- 19. TOP 10 locations with the highest number of people vacinnated 
+SELECT continent, location, population, Max(people_vaccinated)as total_vaccination, ROUND(max(people_vaccinated)/population *100,2) as percentage_Population_vaccinated 
+FROM schema1.`covid-data`
+WHERE continent != 'Null'
+GROUP BY continent, location, population
+ORDER BY total_vaccination DESC;
